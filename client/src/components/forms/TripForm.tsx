@@ -41,6 +41,7 @@ export default function TripForm({ onSubmit, submitting }: Props) {
         setLoadError(firstApiError(err, "Unable to load vehicles/drivers")),
       );
   }, []);
+
   const {
     register,
     handleSubmit,
@@ -61,21 +62,25 @@ export default function TripForm({ onSubmit, submitting }: Props) {
     cargoWeight > Number(selectedVehicle.maxLoadCapacity);
 
   const inputCls =
-    "mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-900 disabled:bg-slate-50 disabled:text-slate-400";
-  const errorCls = "mt-1 text-xs text-red-600";
+    "mt-1 w-full rounded-md border border-paper-dim px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-signal disabled:bg-paper disabled:text-graphite-faint";
+  const errorCls = "mt-1 text-xs text-route";
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="grid gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2"
+      className="card rail grid gap-4 p-4 md:grid-cols-2 md:p-6"
+      style={{ ["--rail-color" as string]: "#1f8a7a" }}
     >
       {loadError && (
-        <div className="md:col-span-2 rounded-md bg-amber-50 border border-amber-200 p-3 text-sm text-amber-700">
+        <div
+          className="card rail md:col-span-2 p-3 text-sm"
+          style={{ ["--rail-color" as string]: "#e8a13d", color: "#8a5f14" }}
+        >
           {loadError}
         </div>
       )}
 
-      <label className="text-sm font-medium text-slate-700">
+      <label className="text-sm font-medium text-graphite-soft">
         Origin / source
         <input
           className={inputCls}
@@ -85,7 +90,7 @@ export default function TripForm({ onSubmit, submitting }: Props) {
         {errors.source && <p className={errorCls}>{errors.source.message}</p>}
       </label>
 
-      <label className="text-sm font-medium text-slate-700">
+      <label className="text-sm font-medium text-graphite-soft">
         Destination
         <input
           className={inputCls}
@@ -97,7 +102,7 @@ export default function TripForm({ onSubmit, submitting }: Props) {
         )}
       </label>
 
-      <label className="text-sm font-medium text-slate-700">
+      <label className="text-sm font-medium text-graphite-soft">
         Vehicle
         <select className={inputCls} {...register("vehicleId")}>
           <option value="">Select available vehicle</option>
@@ -112,13 +117,13 @@ export default function TripForm({ onSubmit, submitting }: Props) {
           <p className={errorCls}>{errors.vehicleId.message}</p>
         )}
         {vehicles.length === 0 && !loadError && (
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-graphite-faint">
             No available vehicles right now.
           </p>
         )}
       </label>
 
-      <label className="text-sm font-medium text-slate-700">
+      <label className="text-sm font-medium text-graphite-soft">
         Driver
         <select className={inputCls} {...register("driverId")}>
           <option value="">Select available driver</option>
@@ -133,13 +138,13 @@ export default function TripForm({ onSubmit, submitting }: Props) {
           <p className={errorCls}>{errors.driverId.message}</p>
         )}
         {drivers.length === 0 && !loadError && (
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-graphite-faint">
             No available drivers right now.
           </p>
         )}
       </label>
 
-      <label className="text-sm font-medium text-slate-700">
+      <label className="text-sm font-medium text-graphite-soft">
         Cargo weight (kg)
         <input
           type="number"
@@ -153,20 +158,20 @@ export default function TripForm({ onSubmit, submitting }: Props) {
           <p className={errorCls}>{errors.cargoWeight.message}</p>
         )}
         {overCapacity && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs font-medium text-route">
             ⚠️ Exceeds vehicle capacity of{" "}
             {Number(selectedVehicle!.maxLoadCapacity)} kg — dispatch will be
             rejected.
           </p>
         )}
         {selectedVehicle && !overCapacity && cargoWeight > 0 && (
-          <p className="mt-1 text-xs text-emerald-600">
+          <p className="mt-1 text-xs" style={{ color: "#146357" }}>
             Within capacity ({Number(selectedVehicle.maxLoadCapacity)} kg max).
           </p>
         )}
       </label>
 
-      <label className="text-sm font-medium text-slate-700">
+      <label className="text-sm font-medium text-graphite-soft">
         Planned distance (km)
         <input
           type="number"
@@ -185,12 +190,12 @@ export default function TripForm({ onSubmit, submitting }: Props) {
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink-soft disabled:opacity-60"
         >
           <Save className="h-4 w-4" />
           {submitting ? "Creating…" : "Create trip (draft)"}
         </button>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-graphite-faint">
           Trip is saved as a draft — dispatch separately when ready.
         </p>
       </div>

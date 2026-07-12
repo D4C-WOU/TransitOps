@@ -10,6 +10,42 @@ export default function NewVehiclePage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const save = async (values: VehicleFormValues) => { setSubmitting(true); setError(null); try { await api.post("/vehicles", values); router.push("/vehicles"); } catch (err) { setError(firstApiError(err, "Unable to create vehicle")); } finally { setSubmitting(false); } };
-  return <div className="space-y-4"><h1 className="text-2xl font-semibold text-slate-950">New vehicle</h1>{error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>}<VehicleForm onSubmit={save} submitting={submitting} /></div>;
+
+  const save = async (values: VehicleFormValues) => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      await api.post("/vehicles", values);
+      router.push("/vehicles");
+    } catch (err) {
+      setError(firstApiError(err, "Unable to create vehicle"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h1 className="font-display text-2xl font-semibold text-graphite">
+          New vehicle
+        </h1>
+        <p className="text-sm text-graphite-soft">
+          Add a vehicle to the fleet manifest — registration number must be
+          unique.
+        </p>
+      </div>
+
+      {error && (
+        <div
+          className="card rail p-3 text-sm text-route"
+          style={{ ["--rail-color" as string]: "#c1453a" }}
+        >
+          {error}
+        </div>
+      )}
+
+      <VehicleForm onSubmit={save} submitting={submitting} />
+    </div>
+  );
 }
