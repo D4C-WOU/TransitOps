@@ -1,61 +1,52 @@
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const cookieParser = require("cookie-parser");
-const rateLimit = require("express-rate-limit");
-
-const authRoutes = require("./routes/auth.routes");
-const errorHandler = require("./middlewares/errorHandler.middleware");
-const ApiError = require("./utils/ApiError");
-
-// NOTE: vehicle/driver/trip/maintenance/fuel/expense/dashboard/report routes
-// are scaffolded as empty files and get mounted here as each phase lands.
-// const vehicleRoutes = require("./routes/vehicle.routes");
-// const driverRoutes = require("./routes/driver.routes");
-// const tripRoutes = require("./routes/trip.routes");
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
+import helmet from "helmet";
+import morgan from "morgan";
+import authRoutes from "./modules/auth/auth.routes";
+import dashboardRoutes from "./modules/dashboard/dashboard.routes";
+import driverRoutes from "./modules/drivers/drivers.routes";
+import expenseRoutes from "./modules/expenses/expenses.routes";
+import fuelLogRoutes from "./modules/fuelLogs/fuelLogs.routes";
+import maintenanceRoutes from "./modules/maintenance/maintenance.routes";
+import reportRoutes from "./modules/reports/reports.routes";
+import tripRoutes from "./modules/trips/trips.routes";
+import vehicleRoutes from "./modules/vehicles/vehicles.routes";
+import errorHandler from "./middlewares/error.middleware";
+import { apiLimiter } from "./middlewares/rateLimiter";
+import ApiError from "./utils/ApiError";
 
 const app = express();
 
-// --- Security & parsing middleware ---
 app.use(helmet());
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:3000",
-    credentials: true, // allow the httpOnly auth cookie to be sent
+    credentials: true,
   })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+app.use("/api", apiLimiter);
 
-// General API rate limit (separate, stricter one applied to /auth/login)
-app.use(
-  "/api",
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 300,
-    standardHeaders: true,
-    legacyHeaders: false,
-  })
-);
+app.get("/api/health", (_req, res) => res.json({ success: true, status: "ok" }));
 
-// --- Health check ---
-app.get("/api/health", (req, res) => res.json({ success: true, status: "ok" }));
-
-// --- Routes ---
 app.use("/api/auth", authRoutes);
-// app.use("/api/vehicles", vehicleRoutes);
-// app.use("/api/drivers", driverRoutes);
-// app.use("/api/trips", tripRoutes);
+app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/drivers", driverRoutes);
+app.use("/api/trips", tripRoutes);
+app.use("/api/maintenance", maintenanceRoutes);
+app.use("/api/fuel-logs", fuelLogRoutes);
+app.use("/api/expenses", expenseRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/reports", reportRoutes);
 
-// --- 404 fallback ---
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   next(new ApiError(404, `Route not found: ${req.method} ${req.originalUrl}`));
 });
 
-// --- Global error handler (must be last) ---
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

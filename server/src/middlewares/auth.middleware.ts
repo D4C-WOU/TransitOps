@@ -1,14 +1,14 @@
-const { verifyToken } = require("../utils/jwt");
-const ApiError = require("../utils/ApiError");
-const asyncWrapper = require("../utils/asyncWrapper");
-const prisma = require("../config/db");
+import type { NextFunction, Request, Response } from "express";
+import prisma from "../config/db";
+import ApiError from "../utils/ApiError";
+import asyncHandler from "../utils/asyncHandler";
+import { verifyToken } from "../utils/jwt";
 
-/**
- * Verifies the JWT (from httpOnly cookie, or Authorization: Bearer header
- * as a fallback for non-browser clients) and attaches the current user
- * to req.user. Rejects if the user no longer exists or is inactive.
- */
-const authenticate = asyncWrapper(async (req, res, next) => {
+const authenticate = asyncHandler(async (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
   const bearer = req.headers.authorization?.startsWith("Bearer ")
     ? req.headers.authorization.split(" ")[1]
     : null;
@@ -21,21 +21,17 @@ const authenticate = asyncWrapper(async (req, res, next) => {
   let decoded;
   try {
     decoded = verifyToken(token);
-  } catch (err) {
+  } catch {
     throw new ApiError(401, "Session expired or invalid. Please log in again.");
   }
 
   const user = await prisma.user.findUnique({ where: { id: decoded.id } });
 
-  if (!user) {
-    throw new ApiError(401, "Account no longer exists.");
-  }
-  if (user.status !== "active") {
-    throw new ApiError(403, "This account has been deactivated.");
-  }
+  if (!user) throw new ApiError(401, "Account no longer exists.");
+  if (user.status !== "active") throw new ApiError(403, "This account has been deactivated.");
 
   req.user = { id: user.id, name: user.name, email: user.email, role: user.role };
   next();
 });
 
-module.exports = authenticate;
+export default authenticate;
