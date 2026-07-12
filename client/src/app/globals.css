@@ -2,45 +2,34 @@
 
 /* ────────────────────────────────────────────────────────────────
    TransitOps design tokens — "Dispatch Board"
-   Grounded in the subject: transit-line maps, manifest tickets,
-   depot signage. Ink chrome + paper canvas + signal/transit/route
-   accents borrowed from real dispatch-board and route-map colour
-   coding, rather than a generic SaaS blue.
    ──────────────────────────────────────────────────────────────── */
 @theme {
-  /* Chrome (sidebar / topbar) */
   --color-ink: #10192b;
   --color-ink-soft: #182338;
   --color-ink-line: #26334a;
 
-  /* Canvas */
   --color-paper: #f6f4ee;
   --color-paper-dim: #ece8de;
   --color-paper-card: #ffffff;
 
-  /* Accents — read off a depot signal board */
-  --color-signal: #e8a13d;      /* amber — in motion / dispatched */
+  --color-signal: #e8a13d;
   --color-signal-dark: #b97c22;
-  --color-transit: #1f8a7a;     /* teal — in service / good */
+  --color-transit: #1f8a7a;
   --color-transit-dark: #146357;
-  --color-route: #c1453a;       /* rust-red — stopped / attention */
+  --color-route: #c1453a;
   --color-route-dark: #9c332a;
-  --color-rust: #b3651f;        /* workshop / in-shop */
+  --color-rust: #b3651f;
 
-  /* Ink text scale */
   --color-graphite: #20242c;
   --color-graphite-soft: #545b68;
   --color-graphite-faint: #8992a0;
 
-  /* Type — wired to next/font variables set on <body>, see layout.tsx */
   --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-body-src), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-src), ui-monospace, "SFMono-Regular", monospace;
 }
 
-html {
-  color-scheme: light;
-}
+html { color-scheme: light; }
 
 body {
   background: var(--color-paper);
@@ -59,9 +48,6 @@ h1, h2, h3, h4, .font-display {
   letter-spacing: -0.01em;
 }
 
-/* Signature element: the "manifest rail" — a coloured left border
-   keyed to entity status, used on cards/rows across the app so the
-   whole product reads like stubs on a dispatch board. */
 .rail {
   position: relative;
   border-left: 3px solid var(--rail-color, var(--color-graphite-faint));
@@ -87,19 +73,98 @@ h1, h2, h3, h4, .font-display {
   white-space: nowrap;
 }
 
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  flex-shrink: 0;
+.status-dot { width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; }
+
+::selection { background: var(--color-signal); color: var(--color-ink); }
+* { scrollbar-color: var(--color-graphite-faint) transparent; }
+
+/* ────────────────────────────────────────────────────────────────
+   Signature element — the Manifest Ticket (auth screens)
+   A dark ink stub with a live transit line, torn away from a
+   paper-card ticket panel via perforation notches. The route line
+   is a slow, ambient loop: a single dispatch, always in motion.
+   ──────────────────────────────────────────────────────────────── */
+.ticket-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100vh;
+  background: var(--color-paper);
+}
+@media (min-width: 1024px) {
+  .ticket-shell { grid-template-columns: 1.05fr 1fr; }
 }
 
-::selection {
-  background: var(--color-signal);
-  color: var(--color-ink);
+.ticket-stub {
+  position: relative;
+  background: var(--color-ink);
+  color: white;
+  overflow: hidden;
+  display: none;
+}
+@media (min-width: 1024px) {
+  .ticket-stub { display: flex; flex-direction: column; justify-content: space-between; }
 }
 
-/* Scrollbar tuned to the palette, not the browser default */
-* {
-  scrollbar-color: var(--color-graphite-faint) transparent;
+.ticket-stub::after {
+  /* perforation edge, torn toward the form panel */
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -1px;
+  width: 2px;
+  height: 100%;
+  background-image: radial-gradient(circle, var(--color-paper) 2.5px, transparent 2.6px);
+  background-size: 2px 22px;
+  background-repeat: repeat-y;
+}
+
+.ticket-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+}
+
+.route-track {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 2;
+  fill: none;
+}
+.route-line {
+  stroke: var(--color-signal);
+  stroke-width: 2;
+  fill: none;
+  stroke-dasharray: 6 10;
+  animation: dash-flow 6s linear infinite;
+}
+@keyframes dash-flow {
+  to { stroke-dashoffset: -160; }
+}
+.route-dot-glow {
+  filter: drop-shadow(0 0 6px rgba(232, 161, 61, 0.7));
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-line { animation: none; }
+  .route-dot-glow animateMotion { display: none; }
+}
+
+.ticket-form-card {
+  width: 100%;
+  max-width: 26rem;
+  background: var(--color-paper-card);
+  border: 1px solid #e4e0d4;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px -12px rgba(16, 25, 43, 0.18);
+  padding: 2rem;
+}
+
+.ticket-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-graphite-faint);
 }

@@ -18,7 +18,15 @@ export default function DashboardLayout({
     if (!isHydrated) void hydrate();
   }, [isHydrated, hydrate]);
 
-  // Don't render anything until we know auth state
+  // Redirect belongs in an effect, not render — calling router.replace()
+  // while DashboardLayout is rendering trips React's "setState during
+  // render of a different component" warning and can drop the navigation.
+  useEffect(() => {
+    if (isHydrated && !user) {
+      router.replace("/login");
+    }
+  }, [isHydrated, user, router]);
+
   if (!isHydrated) {
     return (
       <div className="grid min-h-screen place-items-center bg-paper text-sm text-graphite-faint">
@@ -27,9 +35,8 @@ export default function DashboardLayout({
     );
   }
 
-  // Hydrated but no user → middleware should catch this, but add client-side guard too
   if (!user) {
-    router.replace("/login");
+    // Effect above will redirect; render nothing in the meantime.
     return null;
   }
 
