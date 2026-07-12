@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login"];
+const PUBLIC_PATHS = ["/login", "/signup"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow public paths through
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
-    // If already logged in (cookie present), redirect away from login
+    // If already logged in (cookie present), redirect away from login/signup
     const token = request.cookies.get("token");
     if (token) {
       return NextResponse.redirect(new URL("/dashboard", request.url));

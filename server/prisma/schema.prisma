@@ -124,6 +124,7 @@ model Trip {
 
   vehicle         Vehicle    @relation(fields: [vehicleId], references: [id])
   driver          Driver     @relation(fields: [driverId], references: [id])
+  revenue         Decimal?   @db.Decimal(10, 2)   
   createdBy       User?      @relation("TripCreatedBy", fields: [createdById], references: [id])
   fuelLogs        FuelLog[]
   expenses        Expense[]

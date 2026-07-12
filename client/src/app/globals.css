@@ -1,17 +1,105 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --sidebar-bg: #0f172a;
-  --sidebar-fg: #cbd5e1;
+/* ────────────────────────────────────────────────────────────────
+   TransitOps design tokens — "Dispatch Board"
+   Grounded in the subject: transit-line maps, manifest tickets,
+   depot signage. Ink chrome + paper canvas + signal/transit/route
+   accents borrowed from real dispatch-board and route-map colour
+   coding, rather than a generic SaaS blue.
+   ──────────────────────────────────────────────────────────────── */
+@theme {
+  /* Chrome (sidebar / topbar) */
+  --color-ink: #10192b;
+  --color-ink-soft: #182338;
+  --color-ink-line: #26334a;
+
+  /* Canvas */
+  --color-paper: #f6f4ee;
+  --color-paper-dim: #ece8de;
+  --color-paper-card: #ffffff;
+
+  /* Accents — read off a depot signal board */
+  --color-signal: #e8a13d;      /* amber — in motion / dispatched */
+  --color-signal-dark: #b97c22;
+  --color-transit: #1f8a7a;     /* teal — in service / good */
+  --color-transit-dark: #146357;
+  --color-route: #c1453a;       /* rust-red — stopped / attention */
+  --color-route-dark: #9c332a;
+  --color-rust: #b3651f;        /* workshop / in-shop */
+
+  /* Ink text scale */
+  --color-graphite: #20242c;
+  --color-graphite-soft: #545b68;
+  --color-graphite-faint: #8992a0;
+
+  /* Type — wired to next/font variables set on <body>, see layout.tsx */
+  --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-body-src), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-src), ui-monospace, "SFMono-Regular", monospace;
+}
+
+html {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-paper);
+  color: var(--color-graphite);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.font-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Signature element: the "manifest rail" — a coloured left border
+   keyed to entity status, used on cards/rows across the app so the
+   whole product reads like stubs on a dispatch board. */
+.rail {
+  position: relative;
+  border-left: 3px solid var(--rail-color, var(--color-graphite-faint));
+}
+
+.card {
+  background: var(--color-paper-card);
+  border: 1px solid #e4e0d4;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(16, 25, 43, 0.04);
 }
 
 .status-pill {
-  @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem 0.2rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+::selection {
+  background: var(--color-signal);
+  color: var(--color-ink);
+}
+
+/* Scrollbar tuned to the palette, not the browser default */
+* {
+  scrollbar-color: var(--color-graphite-faint) transparent;
 }

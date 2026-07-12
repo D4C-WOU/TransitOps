@@ -21,7 +21,7 @@ export default function DashboardLayout({
   // Don't render anything until we know auth state
   if (!isHydrated) {
     return (
-      <div className="grid min-h-screen place-items-center text-sm text-slate-500">
+      <div className="grid min-h-screen place-items-center bg-paper text-sm text-graphite-faint">
         Loading workspace...
       </div>
     );
@@ -34,7 +34,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-paper">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />

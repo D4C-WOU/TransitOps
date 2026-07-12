@@ -61,6 +61,47 @@ export const login = asyncWrapper(async (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/auth/signup
+ *
+ * Self-serve signup deliberately only ever creates a base "driver"
+ * account, regardless of anything the client sends. Every other role
+ * (fleet_manager, safety_officer, financial_analyst, admin) has real
+ * operational authority — assigning trips, closing maintenance, viewing
+ * financials — so per the RBAC model in spec 3.1, those are provisioned
+ * by an admin, not chosen by whoever fills out this form.
+ */
+export const signup = asyncWrapper(async (req: Request, res: Response) => {
+  const { name, email, password } = req.body;
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    throw new ApiError(409, "An account with this email already exists.", [
+      { field: "email", message: "An account with this email already exists." },
+    ]);
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  const user = await prisma.user.create({
+    data: { name, email, passwordHash, role: "driver" },
+  });
+
+  const token = signToken({ id: user.id, role: user.role });
+  res.cookie("token", token, COOKIE_OPTIONS);
+
+  return res.status(201).json({
+    success: true,
+    message: "Account created.",
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  });
+});
+
+/**
  * GET /api/auth/me
  */
 export const me = asyncWrapper(async (req: Request, res: Response) => {
