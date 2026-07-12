@@ -22,7 +22,6 @@ export default function MaintenancePage() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  // New log form state
   const [vehicleId, setVehicleId] = useState("");
   const [type, setType] = useState("");
   const [description, setDescription] = useState("");
@@ -59,10 +58,8 @@ export default function MaintenancePage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!vehicleId || !type.trim()) {
-      setFormError("Vehicle and maintenance type are required.");
-      return;
-    }
+    if (!vehicleId || !type.trim())
+      return setFormError("Vehicle and maintenance type are required.");
     setSubmitting(true);
     setFormError(null);
     try {
@@ -86,20 +83,22 @@ export default function MaintenancePage() {
   };
 
   const inputCls =
-    "mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-900";
+    "mt-1 w-full rounded-md border border-paper-dim px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-signal";
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Maintenance</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="font-display text-2xl font-semibold text-graphite">
+            Maintenance
+          </h1>
+          <p className="text-sm text-graphite-soft">
             Active logs automatically place vehicles in shop.
           </p>
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white"
+          className="inline-flex items-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-medium text-white hover:bg-ink-soft"
         >
           {showForm ? (
             <>
@@ -113,19 +112,21 @@ export default function MaintenancePage() {
         </button>
       </div>
 
-      {/* Create form */}
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm grid gap-4 md:grid-cols-2"
+          className="card grid gap-4 p-4 md:grid-cols-2"
         >
           {formError && (
-            <div className="md:col-span-2 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+            <div
+              className="card rail md:col-span-2 p-3 text-sm text-route"
+              style={{ ["--rail-color" as string]: "#c1453a" }}
+            >
               {formError}
             </div>
           )}
 
-          <label className="text-sm font-medium text-slate-700">
+          <label className="text-sm font-medium text-graphite-soft">
             Vehicle
             <select
               className={inputCls}
@@ -143,7 +144,7 @@ export default function MaintenancePage() {
             </select>
           </label>
 
-          <label className="text-sm font-medium text-slate-700">
+          <label className="text-sm font-medium text-graphite-soft">
             Type
             <input
               className={inputCls}
@@ -153,7 +154,7 @@ export default function MaintenancePage() {
             />
           </label>
 
-          <label className="text-sm font-medium text-slate-700">
+          <label className="text-sm font-medium text-graphite-soft">
             Description (optional)
             <input
               className={inputCls}
@@ -163,7 +164,7 @@ export default function MaintenancePage() {
             />
           </label>
 
-          <label className="text-sm font-medium text-slate-700">
+          <label className="text-sm font-medium text-graphite-soft">
             Estimated cost ₹ (optional)
             <input
               type="number"
@@ -180,7 +181,7 @@ export default function MaintenancePage() {
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+              className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
             >
               {submitting ? "Opening…" : "Open maintenance log"}
             </button>
@@ -189,30 +190,36 @@ export default function MaintenancePage() {
       )}
 
       {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
+        <div
+          className="card rail p-3 text-sm text-route"
+          style={{ ["--rail-color" as string]: "#c1453a" }}
+        >
           {error}
         </div>
       )}
 
       <div className="grid gap-3">
         {rows.length === 0 && !error && (
-          <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center">
-            <p className="text-sm text-slate-500">No maintenance logs found.</p>
+          <div className="card border-dashed p-8 text-center">
+            <p className="text-sm text-graphite-faint">
+              No maintenance logs found.
+            </p>
           </div>
         )}
         {rows.map((row) => (
           <div
             key={row.id}
-            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+            className="card rail flex flex-wrap items-center justify-between gap-3 p-4"
+            style={{ ["--rail-color" as string]: "#b3651f" }}
           >
             <div>
-              <p className="font-medium">
+              <p className="font-display font-medium text-graphite">
                 {row.vehicle.registrationNumber} / {row.type}
               </p>
               {row.description && (
-                <p className="text-sm text-slate-500">{row.description}</p>
+                <p className="text-sm text-graphite-soft">{row.description}</p>
               )}
-              <p className="text-sm text-slate-500">
+              <p className="font-tabular text-sm text-graphite-faint">
                 Cost ₹{Number(row.cost || 0).toLocaleString()} ·{" "}
                 {new Date(row.startedAt).toLocaleDateString()}
               </p>
@@ -222,7 +229,7 @@ export default function MaintenancePage() {
               {row.status === "active" && (
                 <button
                   onClick={() => close(row.id)}
-                  className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white"
+                  className="rounded-md bg-ink px-3 py-1.5 text-xs font-medium text-white hover:bg-ink-soft"
                 >
                   Close
                 </button>

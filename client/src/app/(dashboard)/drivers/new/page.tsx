@@ -28,13 +28,18 @@ export default function NewDriverPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-950">New driver</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="font-display text-2xl font-semibold text-graphite">
+          New driver
+        </h1>
+        <p className="text-sm text-graphite-soft">
           Register a new driver with license and contact details.
         </p>
       </div>
       {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
+        <div
+          className="card rail p-3 text-sm text-route"
+          style={{ ["--rail-color" as string]: "#c1453a" }}
+        >
           {error}
         </div>
       )}

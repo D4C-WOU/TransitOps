@@ -54,43 +54,51 @@ export default function DashboardPage() {
           value: data.fleet.totalVehicles,
           sub: `${data.fleet.available} available`,
           icon: Truck,
+          rail: "#1f8a7a",
         },
         {
           label: "Utilization",
           value: `${data.fleet.utilization}%`,
           sub: `${data.fleet.onTrip} on trip`,
           icon: Activity,
+          rail: "#e8a13d",
         },
         {
           label: "Drivers",
           value: data.drivers.totalDrivers,
           sub: "registered drivers",
           icon: Users,
+          rail: "#8992a0",
         },
         {
           label: "Ops cost",
           value: `Rs ${data.costs.total.toLocaleString()}`,
           sub: `${data.costs.liters} L fuel`,
           icon: IndianRupee,
+          rail: "#b3651f",
         },
       ]
     : [];
 
+  const selectCls =
+    "rounded-md border border-paper-dim bg-paper-card px-3 py-2 text-sm text-graphite outline-none focus:ring-2 focus:ring-signal";
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-950">Dashboard</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="font-display text-2xl font-semibold text-graphite">
+          Dashboard
+        </h1>
+        <p className="text-sm text-graphite-soft">
           Live operational snapshot from MySQL via Prisma aggregations.
         </p>
       </div>
 
-      {/* Filters — vehicle type / region (spec 3.2) */}
       <div className="flex flex-wrap gap-2">
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+          className={selectCls}
         >
           <option value="">All vehicle types</option>
           {VEHICLE_TYPES.map((t) => (
@@ -102,7 +110,7 @@ export default function DashboardPage() {
         <select
           value={region}
           onChange={(e) => setRegion(e.target.value)}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+          className={selectCls}
         >
           <option value="">All regions</option>
           {REGIONS.map((r) => (
@@ -117,7 +125,7 @@ export default function DashboardPage() {
               setType("");
               setRegion("");
             }}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded-md border border-paper-dim px-3 py-2 text-sm text-graphite-soft hover:bg-paper"
           >
             Clear filters
           </button>
@@ -125,12 +133,15 @@ export default function DashboardPage() {
       </div>
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div
+          className="card rail p-4 text-sm text-route"
+          style={{ ["--rail-color" as string]: "#c1453a" }}
+        >
           {error}
         </div>
       )}
       {!data && !error && (
-        <div className="text-sm text-slate-500">Loading KPIs...</div>
+        <div className="text-sm text-graphite-faint">Loading KPIs...</div>
       )}
 
       {data && (
@@ -141,55 +152,78 @@ export default function DashboardPage() {
               return (
                 <div
                   key={card.label}
-                  className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+                  className="card rail p-4"
+                  style={{ ["--rail-color" as string]: card.rail }}
                 >
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-slate-500">{card.label}</p>
-                    <Icon className="h-4 w-4 text-slate-400" />
+                    <p className="text-sm text-graphite-soft">{card.label}</p>
+                    <Icon className="h-4 w-4 text-graphite-faint" />
                   </div>
-                  <p className="mt-3 text-2xl font-semibold text-slate-950">
+                  <p className="font-tabular mt-3 text-2xl font-semibold text-graphite">
                     {card.value}
                   </p>
-                  <p className="text-xs text-slate-500">{card.sub}</p>
+                  <p className="text-xs text-graphite-faint">{card.sub}</p>
                 </div>
               );
             })}
           </section>
           <section className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-900">
+            <div
+              className="card rail p-4"
+              style={{ ["--rail-color" as string]: "#1f8a7a" }}
+            >
+              <h2 className="font-display text-sm font-semibold text-graphite">
                 Fleet status
               </h2>
               <div className="mt-4 grid grid-cols-3 gap-3 text-center text-sm">
-                <div className="rounded-md bg-emerald-50 p-3 text-emerald-700">
-                  {data.fleet.available}
-                  <br />
+                <div
+                  className="rounded-md p-3"
+                  style={{ background: "#e4f3ef", color: "#146357" }}
+                >
+                  <p className="font-tabular text-lg font-semibold">
+                    {data.fleet.available}
+                  </p>
                   available
                 </div>
-                <div className="rounded-md bg-blue-50 p-3 text-blue-700">
-                  {data.fleet.onTrip}
-                  <br />
+                <div
+                  className="rounded-md p-3"
+                  style={{ background: "#fbedd6", color: "#8a5f14" }}
+                >
+                  <p className="font-tabular text-lg font-semibold">
+                    {data.fleet.onTrip}
+                  </p>
                   on trip
                 </div>
-                <div className="rounded-md bg-amber-50 p-3 text-amber-700">
-                  {data.fleet.inShop}
-                  <br />
+                <div
+                  className="rounded-md p-3"
+                  style={{ background: "#f5e6d8", color: "#7a4315" }}
+                >
+                  <p className="font-tabular text-lg font-semibold">
+                    {data.fleet.inShop}
+                  </p>
                   in shop
                 </div>
               </div>
             </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-900">
+            <div
+              className="card rail p-4"
+              style={{ ["--rail-color" as string]: "#e8a13d" }}
+            >
+              <h2 className="font-display text-sm font-semibold text-graphite">
                 Trips by status
               </h2>
               <div className="mt-4 space-y-2">
                 {data.trips.map((trip) => (
                   <div
                     key={trip.status}
-                    className="flex items-center justify-between rounded-md bg-slate-50 px-3 py-2 text-sm"
+                    className="flex items-center justify-between rounded-md bg-paper px-3 py-2 text-sm"
                   >
-                    <span>{trip.status.replace(/_/g, " ")}</span>
-                    <span className="font-semibold">{trip.count}</span>
+                    <span className="capitalize text-graphite-soft">
+                      {trip.status.replace(/_/g, " ")}
+                    </span>
+                    <span className="font-tabular font-semibold text-graphite">
+                      {trip.count}
+                    </span>
                   </div>
                 ))}
               </div>

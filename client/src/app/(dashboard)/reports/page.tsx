@@ -12,7 +12,6 @@ type CostRow = {
   totalCost: number;
   roiPercent: number;
 };
-
 type FuelRow = {
   vehicleId: number;
   registrationNumber: string;
@@ -20,7 +19,6 @@ type FuelRow = {
   liters: number;
   kmPerLiter: number;
 };
-
 type UtilRow = {
   vehicleId: number;
   registrationNumber: string;
@@ -31,6 +29,17 @@ type UtilRow = {
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+function ExportButton({ href }: { href: string }) {
+  return (
+    <a
+      href={href}
+      className="rounded-md bg-ink px-3 py-1.5 text-xs font-medium text-white hover:bg-ink-soft"
+    >
+      Export CSV
+    </a>
+  );
+}
 
 export default function ReportsPage() {
   const [cost, setCost] = useState<CostRow[]>([]);
@@ -55,35 +64,36 @@ export default function ReportsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-950">Reports</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="font-display text-2xl font-semibold text-graphite">
+          Reports
+        </h1>
+        <p className="text-sm text-graphite-soft">
           Fuel efficiency, fleet utilization, operational cost and ROI —
           generated from relational records.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
+        <div
+          className="card rail p-3 text-sm text-route"
+          style={{ ["--rail-color" as string]: "#c1453a" }}
+        >
           {error}
         </div>
       )}
 
-      {/* Fuel Efficiency */}
       <section className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="font-display text-lg font-semibold text-graphite">
             Fuel efficiency (km/L)
           </h2>
-          <a
+          <ExportButton
             href={`${API_BASE}/reports/fuel-efficiency?format=csv`}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white"
-          >
-            Export CSV
-          </a>
+          />
         </div>
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="card overflow-hidden">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+            <thead className="bg-paper text-xs uppercase text-graphite-faint">
               <tr>
                 <th className="p-3">Vehicle</th>
                 <th className="p-3">Distance (km)</th>
@@ -94,14 +104,22 @@ export default function ReportsPage() {
             <tbody>
               {fuel.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-4 text-center text-slate-400">
+                  <td
+                    colSpan={4}
+                    className="p-4 text-center text-graphite-faint"
+                  >
                     No fuel data yet.
                   </td>
                 </tr>
               )}
               {fuel.map((row) => (
-                <tr key={row.vehicleId} className="border-t border-slate-100">
-                  <td className="p-3 font-medium">{row.registrationNumber}</td>
+                <tr
+                  key={row.vehicleId}
+                  className="border-t border-paper-dim font-tabular"
+                >
+                  <td className="p-3 font-medium text-graphite">
+                    {row.registrationNumber}
+                  </td>
                   <td className="p-3">{row.distance}</td>
                   <td className="p-3">{row.liters}</td>
                   <td className="p-3">{row.kmPerLiter}</td>
@@ -112,22 +130,16 @@ export default function ReportsPage() {
         </div>
       </section>
 
-      {/* Fleet Utilization */}
       <section className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="font-display text-lg font-semibold text-graphite">
             Fleet utilization
           </h2>
-          <a
-            href={`${API_BASE}/reports/utilization?format=csv`}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white"
-          >
-            Export CSV
-          </a>
+          <ExportButton href={`${API_BASE}/reports/utilization?format=csv`} />
         </div>
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="card overflow-hidden">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+            <thead className="bg-paper text-xs uppercase text-graphite-faint">
               <tr>
                 <th className="p-3">Vehicle</th>
                 <th className="p-3">Status</th>
@@ -139,20 +151,25 @@ export default function ReportsPage() {
             <tbody>
               {util.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-4 text-center text-slate-400">
+                  <td
+                    colSpan={5}
+                    className="p-4 text-center text-graphite-faint"
+                  >
                     No trip data yet.
                   </td>
                 </tr>
               )}
               {util.map((row) => (
-                <tr key={row.vehicleId} className="border-t border-slate-100">
-                  <td className="p-3 font-medium">{row.registrationNumber}</td>
-                  <td className="p-3 capitalize">
+                <tr key={row.vehicleId} className="border-t border-paper-dim">
+                  <td className="p-3 font-tabular font-medium text-graphite">
+                    {row.registrationNumber}
+                  </td>
+                  <td className="p-3 capitalize text-graphite-soft">
                     {row.status.replace(/_/g, " ")}
                   </td>
-                  <td className="p-3">{row.totalTrips}</td>
-                  <td className="p-3">{row.completedTrips}</td>
-                  <td className="p-3">{row.utilizationScore}%</td>
+                  <td className="font-tabular p-3">{row.totalTrips}</td>
+                  <td className="font-tabular p-3">{row.completedTrips}</td>
+                  <td className="font-tabular p-3">{row.utilizationScore}%</td>
                 </tr>
               ))}
             </tbody>
@@ -160,22 +177,18 @@ export default function ReportsPage() {
         </div>
       </section>
 
-      {/* Operational Cost + ROI */}
       <section className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="font-display text-lg font-semibold text-graphite">
             Operational cost & ROI
           </h2>
-          <a
+          <ExportButton
             href={`${API_BASE}/reports/operational-cost?format=csv`}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white"
-          >
-            Export CSV
-          </a>
+          />
         </div>
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="card overflow-hidden">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+            <thead className="bg-paper text-xs uppercase text-graphite-faint">
               <tr>
                 <th className="p-3">Vehicle</th>
                 <th className="p-3">Fuel</th>
@@ -188,14 +201,22 @@ export default function ReportsPage() {
             <tbody>
               {cost.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-4 text-center text-slate-400">
+                  <td
+                    colSpan={6}
+                    className="p-4 text-center text-graphite-faint"
+                  >
                     No cost data yet.
                   </td>
                 </tr>
               )}
               {cost.map((row) => (
-                <tr key={row.vehicleId} className="border-t border-slate-100">
-                  <td className="p-3 font-medium">{row.registrationNumber}</td>
+                <tr
+                  key={row.vehicleId}
+                  className="border-t border-paper-dim font-tabular"
+                >
+                  <td className="p-3 font-medium text-graphite">
+                    {row.registrationNumber}
+                  </td>
                   <td className="p-3">Rs {row.fuel.toLocaleString()}</td>
                   <td className="p-3">Rs {row.expenses.toLocaleString()}</td>
                   <td className="p-3">Rs {row.maintenance.toLocaleString()}</td>
