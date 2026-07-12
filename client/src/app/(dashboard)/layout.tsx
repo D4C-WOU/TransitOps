@@ -6,20 +6,31 @@ import { useAuthStore } from "@/store/authStore";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
-  const { user, isLoading, isHydrated, hydrate } = useAuthStore();
+  const { user, isHydrated, hydrate } = useAuthStore();
 
   useEffect(() => {
     if (!isHydrated) void hydrate();
   }, [isHydrated, hydrate]);
 
-  useEffect(() => {
-    if (isHydrated && !isLoading && !user) router.replace("/login");
-  }, [isHydrated, isLoading, user, router]);
+  // Don't render anything until we know auth state
+  if (!isHydrated) {
+    return (
+      <div className="grid min-h-screen place-items-center text-sm text-slate-500">
+        Loading workspace...
+      </div>
+    );
+  }
 
-  if (isLoading) {
-    return <div className="grid min-h-screen place-items-center text-sm text-slate-500">Loading workspace...</div>;
+  // Hydrated but no user → middleware should catch this, but add client-side guard too
+  if (!user) {
+    router.replace("/login");
+    return null;
   }
 
   return (

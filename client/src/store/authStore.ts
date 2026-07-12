@@ -4,7 +4,6 @@ import type { User } from "@/types";
 
 type AuthState = {
   user: User | null;
-  isLoading: boolean;
   isHydrated: boolean;
   setUser: (user: User | null) => void;
   hydrate: () => Promise<void>;
@@ -13,20 +12,18 @@ type AuthState = {
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  isLoading: true,
   isHydrated: false,
-  setUser: (user) => set({ user }),
+  setUser: (user) => set({ user, isHydrated: true }),
   hydrate: async () => {
-    set({ isLoading: true });
     try {
       const user = await meRequest();
-      set({ user, isHydrated: true, isLoading: false });
+      set({ user, isHydrated: true });
     } catch {
-      set({ user: null, isHydrated: true, isLoading: false });
+      set({ user: null, isHydrated: true });
     }
   },
   logout: async () => {
     await logoutRequest();
-    set({ user: null, isHydrated: true, isLoading: false });
+    set({ user: null, isHydrated: true });
   },
 }));
